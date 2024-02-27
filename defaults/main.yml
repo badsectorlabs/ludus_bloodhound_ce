@@ -1,0 +1,3 @@
+---
+ludus_bh_ce_install_path: /opt/bloodhound
+ludus_bh_localhost: true

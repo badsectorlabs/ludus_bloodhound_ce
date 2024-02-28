@@ -42,11 +42,21 @@ ludus:
       - ludus_bloodhound-ce
 ```
 
+To use this role as shown in the example above:
+
+```
+# Clone the repo
+git clone https://github.com/bad-sector-labs/ludus_bloodhound-ce
+
+# Add repo to your local inventory
+ludus ansible role add -d ludus_bloodhound-ce
+```
+
 ## License
 
 GPLv3
 
-Role install [Bloodhound-CE](https://github.com/SpecterOps/BloodHound). Credits to the SpecterOps team for the amazing contributions to the industry.
+Role installs [Bloodhound-CE](https://github.com/SpecterOps/BloodHound). Credits to the SpecterOps team for the amazing contributions to the industry.
 
 ## Author Information
 

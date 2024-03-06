@@ -39,17 +39,18 @@ ludus:
       snapshot: false
       block_internet: false
     roles:
-      - ludus_bloodhound-ce
+      - badsectorlabs.ludus_bloodhound-ce # to install from ansible galaxy
 ```
 
 To use this role as shown in the example above:
 
 ```
 # Clone the repo
-git clone https://github.com/bad-sector-labs/ludus_bloodhound-ce
+git clone https://github.com/badsectorlabs/ludus_bloodhound-ce
 
 # Add repo to your local inventory
 ludus ansible role add -d ludus_bloodhound-ce
+
 ```
 
 ## License

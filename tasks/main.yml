@@ -1,129 +1,60 @@
 ---
-- name: Reinstall ca-certificates
-  become: true
-  ansible.builtin.apt:
-    name: ca-certificates
-    state: latest
-    update_cache: yes
-
-- name: Check if BH is already installed
+- name: Check if Bloodhound is already installed
   ansible.builtin.stat:
-    path: /opt/bloodhound/docker-compose.yml
+    path: "{{ ludus_bloodhound_ce_install_path }}/docker-compose.yml"
   register: bh_installed
 
-- name: Copy local script to target
-  ansible.builtin.copy:
-    src: files/docker-cleanup.sh
-    dest: /opt/docker-cleanup.sh
-    mode: 0755
-
-- name: Exit the playbook if BH is already installed
-  ansible.builtin.fail:
-    msg: "Bloodhound is already installed"
+- name: End the play if Bloodhound is already installed - to run this play again remove the directory {{ ludus_bloodhound_ce_install_path }}
+  ansible.builtin.meta: end_host
   when: bh_installed.stat.exists
 
 - name: Make bloodhound directory
   become: true
   ansible.builtin.file:
-    path: "{{ ludus_bh_ce_install_path }}"
+    path: "{{ ludus_bloodhound_ce_install_path }}"
     state: directory
+    mode: "0755"
 
-- name: Download BH docker-compose if bh_installed is false
+- name: Copy the docker-compose.yml file
   become: true
-  ansible.builtin.shell:
-    cmd: |
-      curl -L https://ghst.ly/getbhce > /opt/bloodhound/docker-compose.yml
-  when: not bh_installed.stat.exists
-
-- name: Check if Docker is installed
-  become: true
-  command: docker -v 
-  register: docker_installed
-  ignore_errors: true
-   
-- name: Install Docker 
-  become: true
-  block:
-    - name: Add Docker's official GPG key
-      block:
-        - name: Update APT
-          ansible.builtin.shell:
-            cmd: |
-              apt update -y
-        - name: Install necessary packages
-          become: true
-          ansible.builtin.apt:
-            name:
-              - ca-certificates 
-              - curl
-              - gnupg
-            state: latest
-            update_cache: yes
-        - name: Add GPG key
-          ansible.builtin.shell:
-            cmd: |
-              sudo install -m 0755 -d /etc/apt/keyrings
-              curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-              sudo chmod a+r /etc/apt/keyrings/docker.gpg
-    - name: Add the repository to Apt sources
-      block:
-        - name: Add repos
-          ansible.builtin.shell:
-            cmd: |
-              echo \
-              "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-              "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        - name: Update APT
-          ansible.builtin.shell:
-            cmd: |
-              apt update -y
-
-    - name: Install Docker packages
-      become: true
-      ansible.builtin.apt:
-        name:
-          - docker-ce 
-          - docker-ce-cli 
-          - containerd.io 
-          - docker-buildx-plugin 
-          - docker-compose-plugin
-        state: latest
-        update_cache: yes
-  when: docker_installed.failed
-
-- name: If ludus_bh_localhost is false, create .env file
   ansible.builtin.copy:
-    dest: "/opt/bloodhound/.env"
-    content: "BLOODHOUND_HOST='0.0.0.0'"
-  when: not ludus_bh_localhost
+    src: docker-compose.yml
+    dest: "{{ ludus_bloodhound_ce_install_path }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Set the andmin password var
+  ansible.builtin.set_fact:
+    ludus_bloodhound_admin_password: "{{ lookup('community.general.random_string', length=15, min_lower=1, min_upper=1, min_numeric=1, min_special=1, override_special='!@#$%^&*') }}"
+  when: ludus_bloodhound_admin_password is undefined or ludus_bloodhound_admin_password == None
+
+- name: Copy the .env template to the host
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ ludus_bloodhound_ce_install_path }}/.env"
+    mode: "0600"
+
+- name: Write the password to a file on the remote host
+  ansible.builtin.lineinfile:
+    path: "{{ ludus_bloodhound_ce_install_path }}/bloodhound_admin_password.txt"
+    line: "{{ ludus_bloodhound_admin_password }}"
+    mode: "0600"
+    create: true
+
+- name: If ludus_bloodhound_listen_only_localhost is false, create .env file
+  ansible.builtin.lineinfile:
+    path: "{{ ludus_bloodhound_ce_install_path }}/.env"
+    line: "BLOODHOUND_HOST='0.0.0.0'"
+    mode: "0644"
+  when: not ludus_bloodhound_listen_only_localhost
 
 - name: Start Bloodhound
   become: true
   ansible.builtin.shell:
     cmd: |
-      cd /opt/bloodhound
+      cd {{ ludus_bloodhound_ce_install_path }}
       docker compose up -d
 
-- name: Search docker logs for BH password, ignore if it takes too long
-  become: true
-  ansible.builtin.shell:
-    cmd: docker compose logs | grep -m 1 "Initial Password Set To"
-    chdir: /opt/bloodhound
-  register: bh_admin_password
-  until: bh_admin_password.stdout_lines | length > 0
-  retries: 20
-  delay: 15
-  ignore_errors: true
-
-- name: If BH password is registered, put inside a file 
-  become: true
-  ansible.builtin.copy:
-    content: "{{ bh_admin_password.stdout_lines[0] }}"
-    dest: /opt/bloodhound/bh_admin_password.txt
-  when: bh_admin_password.stdout_lines | length > 0
-
-- name: If BH file is present, Print success
+- name: Alert
   ansible.builtin.debug:
-    msg: "Bloodhound is installed and running!"
-  when: bh_admin_password.stdout_lines | length > 0
+    msg: |
+      Bloodhound is up and running. Access it at http://{{ ansible_host }}:{{ ludus_bloodhound_port }} Access with: admin:{{ ludus_bloodhound_admin_password }}

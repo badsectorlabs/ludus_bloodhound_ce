@@ -1,12 +1,14 @@
 ---
-dependencies: []
+dependencies:
+  - role: geerlingguy.docker
+    version: "7.1.0" # ranges are not supported, newer versions are probably fine
 
 galaxy_info:
-  role_name: ludus_bloodhound-ce
+  role_name: ludus_bloodhound_ce
   author: badsectorlabs
   description: Adds/Runs bloodhound (Specterops CE edition) to a linux system
   company: Bad Sector Labs
-  license: GPLv3
+  license: Apache-2.0
   min_ansible_version: "2.10"
   platforms:
     - name: Debian
@@ -14,8 +16,16 @@ galaxy_info:
         - buster
         - bullseye
         - bookworm
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+        - jammy
+    - name: Kali
+      versions:
+        - "2023"
+        - "2024"
   galaxy_tags:
     - docker
     - bloodhound-ce
     - bloodhound
-

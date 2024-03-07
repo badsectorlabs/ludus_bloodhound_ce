@@ -1,3 +1,9 @@
 ---
-ludus_bh_ce_install_path: /opt/bloodhound
-ludus_bh_localhost: true
+ludus_bloodhound_ce_install_path: /opt/bloodhound
+ludus_bloodhound_listen_only_localhost: true
+ludus_bloodhound_port: "8080"
+ludus_bloodhound_admin_password:
+ludus_bloodhound_admin_principal_name: "admin"
+ludus_bloodhound_admin_email_address: "email@bloodhound.ludus"
+ludus_bloodhound_admin_first_name: "Bloodhound"
+ludus_bloodhound_admin_last_name: "Admin"

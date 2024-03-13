@@ -6,16 +6,17 @@
 # See: https://github.com/ansible/galaxy/issues/46
 
 name: Release
-"on":
+'on':
   push:
     tags:
-      - "*"
+      - '*'
 
 defaults:
   run:
-    working-directory: "badsectorlabs.ludus_bloodhound_ce"
+    working-directory: 'badsectorlabs.ludus_bloodhound_ce'
 
 jobs:
+
   release:
     name: Release
     runs-on: ubuntu-latest
@@ -23,12 +24,12 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v4
         with:
-          path: "badsectorlabs.ludus_bloodhound_ce"
+          path: 'badsectorlabs.ludus_bloodhound_ce'
 
       - name: Set up Python 3.
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
       - name: Install Ansible.
         run: pip3 install ansible-core

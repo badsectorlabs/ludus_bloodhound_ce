@@ -47,7 +47,7 @@
     mode: "0644"
   when: not bh_installed.stat.exists and not ludus_bloodhound_listen_only_localhost
 
-- name: Start Bloodhound
+- name: Start BH-CE Docker Containers
   become: true
   ansible.builtin.shell:
     cmd: |
@@ -57,6 +57,10 @@
 
 - name: BH-CE Installation Complete
   ansible.builtin.debug:
-    msg: |
-      Bloodhound is up and running. Access it at http://{{ ansible_host }}:{{ ludus_bloodhound_port }} Access with: admin:{{ ludus_bloodhound_admin_password }}
+    msg: "Bloodhound is up and running!"
+  when: not bh_installed.stat.exists
+
+- name: BH-CE Credz
+  ansible.builtin.debug:
+    msg: "Access BH-CE at http://{{ ansible_host }}:{{ ludus_bloodhound_port }} using admin -> {{ ludus_bloodhound_admin_password }}"
   when: not bh_installed.stat.exists

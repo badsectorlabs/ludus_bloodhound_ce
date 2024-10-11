@@ -55,6 +55,9 @@ ludus:
       block_internet: false
     roles:
       - badsectorlabs.ludus_bloodhound_ce
+    role_vars:
+      ludus_bloodhound_port: "80"
+      ludus_bloodhound_admin_password: "bloodhoundpassword123"
 ```
 
 ## Ludus setup

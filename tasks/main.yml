@@ -25,11 +25,6 @@
     mode: "0644"
   when: not bh_installed.stat.exists
 
-- name: Set the andmin password var
-  ansible.builtin.set_fact:
-    ludus_bloodhound_admin_password: "{{ lookup('community.general.random_string', length=15, min_lower=1, min_upper=1, min_numeric=1, min_special=1, override_special='!@#$%^&*') }}"
-  when: not bh_installed.stat.exists and (ludus_bloodhound_admin_password is undefined or ludus_bloodhound_admin_password == None)
-
 - name: Copy the .env template to the host
   ansible.builtin.template:
     src: env.j2
@@ -45,7 +40,7 @@
     create: true
   when: not bh_installed.stat.exists
 
-- name: If ludus_bloodhound_listen_only_localhost is false, create .env file
+- name: If ludus_bloodhound_listen_only_localhost is false, Add to .env file
   ansible.builtin.lineinfile:
     path: "{{ ludus_bloodhound_ce_install_path }}/.env"
     line: "BLOODHOUND_HOST='0.0.0.0'"
@@ -60,7 +55,7 @@
       docker compose up -d
   when: not bh_installed.stat.exists
 
-- name: Alert
+- name: BH-CE Installation Complete
   ansible.builtin.debug:
     msg: |
       Bloodhound is up and running. Access it at http://{{ ansible_host }}:{{ ludus_bloodhound_port }} Access with: admin:{{ ludus_bloodhound_admin_password }}

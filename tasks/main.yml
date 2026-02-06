@@ -1,4 +1,10 @@
 ---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
 - name: Check if Bloodhound is already installed
   ansible.builtin.stat:
     path: "{{ ludus_bloodhound_ce_install_path }}/docker-compose.yml"

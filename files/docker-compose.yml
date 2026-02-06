@@ -74,6 +74,7 @@ services:
       - bhe_default_admin_first_name=${bhe_default_admin_first_name}
       - bhe_default_admin_last_name=${bhe_default_admin_last_name}
       - bhe_default_admin_expire_now=false
+      - bhe_graph_driver=pg
       ### Add additional environment variables you wish to use here.
       ### For common configuration options that you might want to use environment variables for, see `.env.example`
       ### example: bhe_database_connection=${bhe_database_connection}

@@ -77,7 +77,7 @@ ludus range config set -f config.yml
 ludus range deploy
 ```
 
-## Trobleshooting
+## Troubleshooting
 
 To force the role to re-run (fresh Bloodhound instance), SSH into the VM, stop the docker container and remove the ludus_bloodhound_ce_install_path folder (default to `/opt/bloodhound`)
 

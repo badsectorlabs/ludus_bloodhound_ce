@@ -2,7 +2,7 @@
 
 An Ansible Role that installs [Bloodhound-CE](https://github.com/SpecterOps/BloodHound) on a debian based system.
 
-- Install Bloodhound-CE version `6.0.0`
+- Install Bloodhound-CE version `8.0.0`
 - Uses `bloodhoundpassword` as default password. Can be changed using `role_vars`.
 - Checks if {{ ludus_bloodhound_ce_install_path }}/docker-compose.yml exists
 - If not, it installs vanilla bloodhound-ce (via docker-compose)
@@ -33,6 +33,9 @@ Available variables are listed below, along with default values (see `defaults/m
     ludus_bloodhound_admin_email_address: "admin@ludus.domain"
     ludus_bloodhound_admin_first_name: "Bloodhound"
     ludus_bloodhound_admin_last_name: "Admin"
+
+    # Bloodhound docker compose tag (version)
+    ludus_bloodhound_tag: "8.0.0"
 
 ## Dependencies
 
